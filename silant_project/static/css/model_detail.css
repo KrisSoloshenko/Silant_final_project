@@ -1,0 +1,30 @@
+.back-cont{
+    margin-top: 20px;
+}
+
+.details-button{
+    margin: 20px 0;
+}
+
+.btn-details, .btn-back{
+    font-family: PT-Astra;
+    font-size: 16px;
+    padding: 8px 16px;
+    background: #163E6C;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    text-decoration: none;
+}
+
+.details-table th,
+.details-table td{
+    padding: 8px 5px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.details-row{
+    font-size: 18px;
+}

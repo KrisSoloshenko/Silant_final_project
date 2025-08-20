@@ -1,0 +1,15 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/button.css' %}">
+    <title>Error</title>
+    <div class="error-cont">
+        <div class="error-tittle">
+            <h1>Ошибка доступа</h1>
+            <p>У вас недостаточно прав для просмотра этой страницы.</p>
+        </div>
+    <div class="btn">
+        <a href="/">Вернуться на главную</a>
+    </div>
+{% endblock %}

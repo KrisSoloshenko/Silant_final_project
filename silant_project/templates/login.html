@@ -1,0 +1,15 @@
+{% extends "default.html" %}
+
+{% load static %}
+{% block content %}
+    <div class="login-container">
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Войти</button>
+                {% if form.errors %}
+                    <p>Неверное имя пользователя или пароль</p>
+                {% endif %}
+        </form>  
+    </div>    
+{% endblock %}

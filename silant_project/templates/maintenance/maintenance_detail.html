@@ -1,0 +1,58 @@
+{% extends 'default.html' %}
+
+{% block content %}
+{% load static %}
+<link rel = "stylesheet" href="{% static 'css/main_detail.css' %}">
+    <div>
+        <div class="container-details">
+            <div class="back-cont">
+                <a href="/" class="btn-back">На главную</a>
+                <a href="/maintenances" class="btn-back">К списку ТО</a>
+            </div>
+            <h1>Детальная информация о техническом обслуживании</h1>
+            <div class="details-header">
+                <h2 class='details-title'>Техническое обслуживание {{ maintenance }}</h2>
+                {% if perms.silant_app.delete_maintenance or perms.silant_app.change_maintenance %}
+                    <div>
+                        <a href="{% url 'maintenance-update' maintenance.pk%}" class="btn-details">Редактировать</a>
+                        <a href="{% url 'maintenance-delete' maintenance.pk%}" class="btn-details">Удалить</a>
+                    </div>
+                {% endif %}
+            </div>
+            <table class="details-content">
+                <tr class="details-row">
+                    <th class="label">Вид ТО:</th>
+                    <td class="value"><a href="{% url 'maintenancetype-detail' maintenance.maintenance_type.pk %}">{{ maintenance.maintenance_type.name }}</a></td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Машина:</th>
+                    <td class="value"><a href="{% url 'machine-detail' maintenance.machine.pk %}">{{ maintenance.machine.serial_number }}</a></td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Дата проведения ТО:</th>
+                    <td class="value">{{ maintenance.maintenance_date }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Наработка, м/час:</th>
+                    <td class="value">{{ maintenance.operating_time }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Номер заказ-наряда:</th>
+                    <td class="value">{{ maintenance.order_number }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Дата заказ-наряда</th>
+                    <td class="value">{{ maintenance.order_date }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Организация, проводившая ТО</th>
+                    <td class="value"><a href="{% url 'maintenanceorganization-detail' maintenance.maintenance_organization.pk%}">{{ maintenance.maintenance_organization.name }}</a></td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Сервисная организация</th>
+                    <td class="value"><a href="{% url 'servicecompany-detail' maintenance.service_company.pk%}">{{ maintenance.service_company.name }}</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}

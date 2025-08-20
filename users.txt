@@ -1,0 +1,17 @@
+Логин/Пароль:
+
+admin/pas11
+
+Manager/manpassword
+
+client1/clipassword
+client2/clipassword
+client3/clipassword
+client4/clipassword
+client5/clipassword
+client6/clipassword
+client7/clipassword
+
+service1/serpassword
+service2/serpassword
+service3/serpassword

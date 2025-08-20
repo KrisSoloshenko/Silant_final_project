@@ -1,0 +1,34 @@
+{% extends 'default.html' %}
+
+{% block content %}
+{% load static %}
+<link rel = "stylesheet" href="{% static 'css/model_detail.css' %}">
+    <div>
+        <div class="details">
+            <div class="back-cont">
+                <a href="/" class="btn-back">На главную</a>
+            </div>
+            <h2>Детальная информация о модели двигателя</h2>
+
+            <table class="details-table">
+                <tr class="details-row">
+                    <th class="label">Название:</th>
+                    <td class="value">{{ engine_model.name }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Описание:</th>
+                    <td class="value">{{ engine_model.description }}</td>
+                </tr>
+            </table>
+
+            {% if user.is_authenticated %}
+                {% if 'Manager' in user.groups.all|join:", " or user.is_superuser %}
+                    <div class="details-button">
+                        <a href="{% url 'engine-update' engine_model.pk %}" class="btn-details">Редактировать</a>
+                        <a href="{% url 'engine-delete' engine_model.pk %}" class="btn-details">Удалить</a>
+                    </div>
+                    {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

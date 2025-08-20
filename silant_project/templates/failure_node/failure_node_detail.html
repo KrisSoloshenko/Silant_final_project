@@ -1,0 +1,34 @@
+{% extends 'default.html' %}
+
+{% block content %}
+{% load static %}
+<link rel = "stylesheet" href="{% static 'css/model_detail.css' %}">
+    <div>
+        <div class="details">
+            <div class="back-cont">
+                <a href="/reclamations" class="btn-back">К списку рекламаций</a>
+            </div>
+            <h2>Детальная информация об узле отказа</h2>
+
+            <table class="details-table">
+                <tr class="details-row">
+                    <th class="label">Название:</th>
+                    <td class="value">{{ failure_node.name }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Описание:</th>
+                    <td class="value">{{ failure_node.description }}</td>
+                </tr>
+            </table>
+
+            {% if user.is_authenticated %}
+                {% if 'Manager' in user.groups.all|join:", " or user.is_superuser %}
+                    <div class="details-button">
+                        <a href="{% url 'failurenode-update' failure_node.pk %}" class="btn-details">Редактировать</a>
+                        <a href="{% url 'failurenode-delete' failure_node.pk %}" class="btn-details">Удалить</a>
+                    </div>
+                    {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

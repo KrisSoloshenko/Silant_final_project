@@ -1,0 +1,66 @@
+{% extends 'default.html' %}
+
+{% block content %}
+{% load static %}
+<link rel = "stylesheet" href="{% static 'css/main_detail.css' %}">
+    <div>
+        <div class="container-details">
+            <div class="back-cont">
+                <a href="/" class="btn-back">На главную</a>
+                <a href="/reclamations" class="btn-back">К списку рекламаций</a>
+            </div>
+            <h1>Детальная информация о рекламации</h1>
+            <div class="details-header">
+                <h2 class='details-title'>Рекламация {{ reclamation }}</h2>
+                {% if perms.silant_app.delete_reclamation or perms.silant_app.change_reclamation %}
+                    <div>
+                        <a href="{% url 'reclamation-update' reclamation.pk%}" class="btn-details">Редактировать</a>
+                        <a href="{% url 'reclamation-delete' reclamation.pk%}" class="btn-details">Удалить</a>
+                    </div>
+                {% endif %}
+            </div>
+            <table class="details-content">
+                <tr class="details-row">
+                    <th class="label">Узел отказа:</th>
+                    <td class="value"><a href="{% url 'failurenode-detail' reclamation.failure_node.pk %}">{{ reclamation.failure_node.name }}</a></td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Дата отказа:</th>
+                    <td class="value">{{ reclamation.failure_date }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Наработка, м/час:</th>
+                    <td class="value">{{ reclamation.operating_time }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Описание отказа:</th>
+                    <td class="value">{{ reclamation.failure_description }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Способ восстановления</th>
+                    <td class="value"><a href="{% url 'recoverymethod-detail' reclamation.recovery_method.pk %}">{{ reclamation.recovery_method.name }}</a></td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Используемые запасные части</th>
+                    <td class="value">{{ reclamation.spare_parts }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Дата восстановления</th>
+                    <td class="value">{{ reclamation.recovery_date }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Время простоя техники</th>
+                    <td class="value">{{ reclamation.downtime }}</td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Машина:</th>
+                    <td class="value"><a href="{% url 'machine-detail' reclamation.machine.pk %}">{{ reclamation.machine.serial_number }}</a></td>
+                </tr>
+                <tr class="details-row">
+                    <th class="label">Сервисная компания</th>
+                    <td class="value"><a href="{% url 'servicecompany-detail' reclamation.service_company.pk %}">{{ reclamation.service_company.name }}</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}

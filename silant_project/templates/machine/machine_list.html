@@ -1,0 +1,182 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="machine-content">
+        {% if user.is_authenticated %}
+        <div class="profile-content">
+            <div class="user-info">
+                {% if user.groups.all %}
+                    {% for group in user.groups.all %}
+                        {% if group.name == "Manager" %}
+                            <h3>Менеджер: {{ user.username }}</h3>
+                        {% elif group.name == "Service" %}
+                            <h3>Сервисная организация: {{ user.servicecompany.name }}</h3>
+                        {% elif group.name == "Client" %}
+                            <h3>Клиент: {{ user.client.name }}</h3>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="navigation-links">
+                <a href="{% url 'machine-list' %}">
+                    <img src="{% static 'media/machine.png' %}" alt="Машины">
+                    <span>Машины</span>
+                </a>
+                <a href="{% url 'maintenance-list' %}">
+                    <img src="{% static 'media/to.png' %}" alt="ТО">
+                    <span>ТО</span>
+                </a>
+                <a href="{% url 'reclamation-list' %}">
+                    <img src="{% static 'media/rec.png' %}" alt="Рекламации">
+                    <span>Рекламации</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="add-btn-container">
+            {% if user.is_authenticated %}
+                {% if 'Manager' in user.groups.all|join:", " or user.is_superuser %}
+                    <a href="{% url 'machine-create' %}" class="add-btn">+ Машину</a>
+                    <a href="{% url 'model-create' %}" class="add-btn">+ Модель техники</a>
+                    <a href="{% url 'engine-create' %}" class="add-btn">+ Модель двигателя</a>
+                    <a href="{% url 'transmission-create' %}" class="add-btn">+ Модель трансмиссии</a>
+                    <a href="{% url 'drivingaxle-create' %}" class="add-btn">+ Модель ведущего моста</a>
+                    <a href="{% url 'steeraxle-create' %}" class="add-btn">+ Модель управляемого моста</a>
+                    <a href="{% url 'servicecompany-create' %}" class="add-btn">+ Сервисную компанию</a>
+                    <a href="{% url 'client-create' %}" class="add-btn">+ Клиента</a>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="search-container">
+            <div class="search-header">
+                <h3>Проверьте комплектацию и технические характеристики техники "Силант"</h3>
+            </div>
+            <div class="search-body">
+                {% if user.is_authenticated %}
+                    <form action="" method="get" class="filter-form">
+                        <div class="filter-row">
+                            {% for f in filterset.form %}
+                                <div class="filter-field">
+                                    <label for="{{ filterset.form.id_for_label}}">{{f.label}}</label>
+                                    <span>{{f}}</span>
+                                </div>
+                            {% endfor%}                 
+                            <div class="filter-field">
+                                <button type="submit" class="btn-submit">Найти</button>
+                                <a href="?" class="btn-reset">Сбросить</a>
+                            </div>
+                        </div>
+                    </form>   
+                {% endif%}
+            </div>
+            <div class="search-body">
+                {% if not user.is_authenticated %}
+                    <form action="" method="get">
+                        <p>
+                            <label for="{{filterset.form.serial_number.id_for_label}}">{{filterset.form.serial_number.label}}</label>
+                            {{filterset.form.serial_number}}
+                        </p>              
+                        <div class="filter-field">
+                            <button type="submit" class="btn-submit">Найти</button>
+                            <button type="reset" class="btn-reset">Сбросить</button>
+                        </div>
+                    </form>             
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="info-header">
+            <h2>Информация о комплектации и технических характеристиках</h2>
+        </div>
+        {% if not machines %}
+            <h3>Данная машина не найдена</h3>
+        {% else %}
+            <div class="table-responsive">
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>Зав. № машины</th>
+                            <th>Модель техники</th>
+                            <th>Модель двигателя</th>
+                            <th>Зав. № двигателя</th>
+                            <th>Модель трансмиссии</th>
+                            <th>Зав. № трансмиссии</th>
+                            <th>Модель ведущего моста</th>
+                            <th>Зав. № ведущего моста</th>
+                            <th>Модель управляемого моста</th>
+                            <th>Зав. № управляемого моста</th>
+                            {% if user.is_authenticated %}
+                                <th>Договор поставки №, дата</th>
+                                <th>Дата отгрузки с завода</th>
+                                <th>Грузополучатель</th>
+                                <th>Адрес поставки</th>
+                                <th>Комплектация</th>
+                                <th>Клиент</th>
+                                <th>Сервисная компания</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for machine in machines %}
+                            <tr>
+                                {% if user.is_authenticated %}
+                                    <td><a href="{% url 'machine-detail' machine.pk %}" class="table-a">{{ machine.serial_number }}</a></td>
+                                    <td><a href="{% url 'model-detail' machine.technic_model.pk %}" class="table-a">{{ machine.technic_model.name }}</a></td>
+                                    <td><a href="{% url 'engine-detail' machine.engine_model.pk %}" class="table-a">{{ machine.engine_model.name }}</a></td>
+                                    <td>{{ machine.engine_number }}</td>
+                                    <td><a href="{% url 'transmission-detail' machine.transmission_model.pk%}" class="table-a">{{ machine.transmission_model.name }}</a></td>
+                                    <td>{{ machine.transmission_number }}</td>
+                                    <td><a href="{% url 'drivingaxle-detail' machine.driving_axle_model.pk %}" class="table-a">{{ machine.driving_axle_model.name }}</a></td>
+                                    <td>{{ machine.driving_axle_number }}</td>
+                                    <td><a href="{% url 'steeraxle-detail' machine.steer_axle_model.pk %}" class="table-a">{{ machine.steer_axle_model.name }}</a></td>
+                                    <td>{{ machine.steer_axle_number }}</td>
+                                    <td>{{ machine.delivery_contract }}</td>
+                                    <td>{{ machine.shipment_date }}</td>
+                                    <td>{{ machine.recipient }}</td>
+                                    <td>{{ machine.delivery_address }}</td>
+                                    <td>{{ machine.configuration }}</td>
+                                    <td><a href="{% url 'client-detail' machine.client.pk %}" class="table-a">{{ machine.client.name }}</a></td>
+                                    <td><a href="{% url 'servicecompany-detail' machine.service_company.pk %}" class="table-a">{{ machine.service_company.name }}</a></td>
+                                {% else %}
+                                    <td>{{ machine.serial_number }}</td>
+                                    <td>{{ machine.technic_model.name }}</td>
+                                    <td>{{ machine.engine_model.name }}</a></td>
+                                    <td>{{ machine.engine_number }}</td>
+                                    <td>{{ machine.transmission_model.name }}</td>
+                                    <td>{{ machine.transmission_number }}</td>
+                                    <td>{{ machine.driving_axle_model.name }}</td>
+                                    <td>{{ machine.driving_axle_number }}</td>
+                                    <td>{{ machine.steer_axle_model.name }}</a></td>
+                                    <td>{{ machine.steer_axle_number }}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class='paginator'>
+        {% if page_obj.has_previous %}
+            <a href="?page=1">1</a>
+            {% if page_obj.previous_page_number != 1 %}
+                ...
+                <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a>
+            {% endif %}
+        {% endif %}
+        {{ page_obj.number }}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+            {% if paginator.num_pages != page_obj.next_page_number %}
+                ...
+                <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+            {% endif %}
+        {% endif %}
+    </div>
+
+{% endblock %}

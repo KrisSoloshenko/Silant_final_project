@@ -1,0 +1,126 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="maintenance-content">
+        <div class="profile-content">
+            <div class="user-info">
+                {% if user.groups.all %}
+                    {% for group in user.groups.all %}
+                        {% if group.name == "Manager" %}
+                            <h3>Менеджер: {{ user.username }}</h3>
+                        {% elif group.name == "Service" %}
+                            <h3>Сервисная организация: {{ user.servicecompany.name }}</h3>
+                        {% elif group.name == "Client" %}
+                            <h3>Клиент: {{ user.client.name }}</h3>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="navigation-links">
+                <a href="{% url 'machine-list' %}">
+                    <img src="{% static 'media/machine.png' %}" alt="Машины">
+                    <span>Машины</span>
+                </a>
+                <a href="{% url 'maintenance-list' %}">
+                    <img src="{% static 'media/to.png' %}" alt="ТО">
+                    <span>ТО</span>
+                </a>
+                <a href="{% url 'reclamation-list' %}">
+                    <img src="{% static 'media/rec.png' %}" alt="Рекламации">
+                    <span>Рекламации</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="add-btn-container">
+                <a href="{% url 'maintenance-create' %}" class="add-btn">+ Новое ТО</a>
+                {% if 'Manager' in user.groups.all|join:", " or user.is_superuser %}
+                    <a href="{% url 'maintenancetype-create' %}" class="add-btn">+ Вид ТО</a>
+                    <a href="{% url 'maintenanceorganization-create'%}" class="add-btn">+ Огранизацию, проводившую ТО</a>
+                {% endif %}
+        </div>
+
+        <div class="search-container">
+            <div class="search-header">
+                <h3>Проверьте данные по техническому обслуживанию техники "Силант"</h3>
+            </div>
+            <div class="search-body">
+                    <form action="" method="get" class="filter-form">
+                        <div class="filter-row">
+                            {% for f in filterset.form %}
+                                <div class="filter-field">
+                                    <label for="{{ filterset.form.id_for_label}}">{{f.label}}</label>
+                                    <span>{{f}}</span>
+                                </div>
+                            {% endfor%}                 
+                            <div class="filter-field">
+                                <button type="submit" class="btn-submit">Найти</button>
+                                <a href="?" class="btn-reset">Сбросить</a>
+                            </div>
+                        </div>
+                    </form>   
+            </div>
+        </div>
+
+
+        <div class="info-header">
+            <h2>Информация о проведенных ТО вашей техники</h2>
+        </div>
+        {% if not maintenances %}
+            <h3>Данных о ТО не найдено</h3>
+        {% else %}
+        <div class="table-responsive">
+            <table class="info-table">
+                <thead>
+                    <tr>
+                        <th>Номер ТО</th>
+                        <th>Машина</th>
+                        <th>Вид ТО</th>
+                        <th>Дата проведения ТО</th>
+                        <th>Наработка, м/час</th>
+                        <th>Номер заказ-наряда</th>
+                        <th>Дата заказ-наряда</th>
+                        <th>Организация, проводившая ТО</th>
+                        <th>Сервисная компания</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for maintenance in maintenances %}
+                        <tr>
+                            <td><a href="{% url 'maintenance-detail' maintenance.pk %}" class="table-a">{{ maintenance.pk }}</a></td>
+                            <td><a href="{% url 'machine-detail' maintenance.machine.pk %}" class="table-a">{{ maintenance.machine.serial_number }}</a></td>
+                            <td><a href="{% url 'maintenancetype-detail' maintenance.maintenance_type.pk %}" class="table-a">{{ maintenance.maintenance_type.name }}</a></td>
+                            <td>{{ maintenance.maintenance_date }}</td>
+                            <td>{{ maintenance.operating_time }}</td>
+                            <td>{{ maintenance.order_number }}</td>
+                            <td>{{ maintenance.order_date }}</td>
+                            <td><a href="{% url 'maintenanceorganization-detail' maintenance.maintenance_organization.pk%}" class="table-a">{{ maintenance.maintenance_organization.name }}</a></td>
+                            <td><a href="{% url 'servicecompany-detail' maintenance.service_company.pk%}" class="table-a">{{ maintenance.service_company.name }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class='paginator'>
+    {% if page_obj.has_previous %}
+        <a href="?page=1">1</a>
+        {% if page_obj.previous_page_number != 1 %}
+            ...
+            <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a>
+        {% endif %}
+    {% endif %}
+    {{ page_obj.number }}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+        {% endif %}
+    {% endif %}
+    </div>
+
+{% endblock %}

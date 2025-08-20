@@ -1,0 +1,16 @@
+{% extends 'default.html' %}
+
+{% block content %}
+{% load static %}
+<link rel = "stylesheet" href="{% static 'css/button.css' %}">
+    <div class="form-container">
+        <h2>Вы уверены, что хотите удалить клиента "{{ client_delete.name }}"?</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class='btn-cont'>
+                    <button type="submit" class="btn">Удалить</button>
+                    <a href="{% url 'client-detail' client_delete.pk %}" class="btn">Отмена</a>
+                </div>
+            </form>
+    </div>
+{% endblock %}

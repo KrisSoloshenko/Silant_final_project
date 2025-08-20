@@ -1,0 +1,218 @@
+{% extends 'default.html' %}
+
+{% block content %}
+{% load static %}
+<link rel = "stylesheet" href="{% static 'css/main_detail.css' %}">
+    <div>
+        <div class="container-details">
+            <div class="back-cont">
+                <a href="/" class="btn-back">На главную</a>
+            </div>
+            
+            <div class="details-header">
+                <h2 class='details-title'>Серийный номер машины: {{ machine.serial_number }}</h2>
+                {% if user.is_authenticated %}
+                    {% if 'Manager' in user.groups.all|join:", " or user.is_superuser %}
+                        <div>
+                            <a href="{% url 'machine-update' machine.pk%}" class="btn-details">Редактировать</a>
+                            <a href="{% url 'machine-delete' machine.pk%}" class="btn-details">Удалить</a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="profile-content">
+                <div class="navigation-links">
+                    <button class="tablinks" onclick="openTable(event, 'Справка')">
+                        <img src="{% static 'media/machine.png' %}" alt="Машины">
+                        <span>Общая информация</span>
+                    </button>
+                    <button class="tablinks" onclick="openTable(event, 'ТО')">
+                        <img src="{% static 'media/to.png' %}" alt="ТО">
+                        <span>ТО</span>
+                    </button>
+                    <button class="tablinks" onclick="openTable(event, 'Рекламации')">
+                        <img src="{% static 'media/rec.png' %}" alt="Рекламации">
+                        <span>Рекламации</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="Справка" class="tabcontent">
+                <h2>Детальная информация о машине</h2>
+                <table class="details-content">
+                    <tr class="details-row">
+                        <th class="label">Модель техники:</th>
+                        <td class="value"><a href="{% url 'model-detail' machine.technic_model.pk %}">{{ machine.technic_model.name }}</a></td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Модель двигателя:</th>
+                        <td class="value"><a href="{% url 'engine-detail' machine.engine_model.pk %}">{{ machine.engine_model.name }}</a></td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Заводской № двигателя:</th>
+                        <td class="value">{{ machine.engine_number }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Модель трансмиссии:</th>
+                        <td class="value"><a href="{% url 'transmission-detail' machine.transmission_model.pk %}">{{ machine.transmission_model.name }}</a></td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Заводской № трансмиссии:</th>
+                        <td class="value">{{ machine.transmission_number }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Модель ведущего моста:</th>
+                        <td class="value"><a href="{% url 'drivingaxle-detail' machine.driving_axle_model.pk %}">{{ machine.driving_axle_model.name }}</a></td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Заводской № ведущего моста:</th>
+                        <td class="value">{{ machine.driving_axle_number }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Модель управляемого моста</th>
+                        <td class="value"><a href="{% url 'steeraxle-detail' machine.steer_axle_model.pk %}">{{ machine.steer_axle_model.name }}</a></td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Заводской № управляемого моста:</th>
+                        <td class="value">{{ machine.steer_axle_number }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Договор поставки (№, дата):</th>
+                        <td class="value">{{ machine.delivery_contract }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Дата отгрузки с завода:</th>
+                        <td class="value">{{ machine.shipment_date }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Грузополучатель:</th>
+                        <td class="value">{{ machine.recipient }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Адрес поставки (эксплуатации):</th>
+                        <td class="value">{{ machine.delivery_address }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Комплектация (доп. опции):</th>
+                        <td class="value">{{ machine.configuration }}</td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Клиент:</th>
+                        <td class="value"><a href="{% url 'client-detail' machine.client.pk %}">{{ machine.client.name }}</a></td>
+                    </tr>
+                    <tr class="details-row">
+                        <th class="label">Сервисная компания:</th>
+                        <td class="value"><a href="{% url 'servicecompany-detail' machine.service_company.pk %}">{{ machine.service_company.name }}</a></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="ТО" class="tabcontent">
+                <h2>Данные по техническому обслуживанию машины</h2>
+                {% if not machine.maintenance_set.all %}
+                    <h3>Данных о рекламациях не найдено</h3>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="info-table">
+                            <thead>
+                                <tr>
+                                    <th>Номер ТО</th>
+                                    <th>Машина</th>
+                                    <th>Вид ТО</th>
+                                    <th>Дата проведения ТО</th>
+                                    <th>Наработка, м/час</th>
+                                    <th>Номер заказ-наряда</th>
+                                    <th>Дата заказ-наряда</th>
+                                    <th>Организация, проводившая ТО</th>
+                                    <th>Сервисная компания</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {% for maintenance in machine.maintenance_set.all %}
+                                        <tr>
+                                            <td><a href="{% url 'maintenance-detail' maintenance.pk %}" class="table-a">{{ maintenance.pk }}</a></td>
+                                            <td><a href="{% url 'machine-detail' maintenance.machine.pk %}" class="table-a">{{ maintenance.machine.serial_number }}</a></td>
+                                            <td><a href="{% url 'maintenancetype-detail' maintenance.maintenance_type.pk %}" class="table-a">{{ maintenance.maintenance_type.name }}</a></td>
+                                            <td>{{ maintenance.maintenance_date }}</td>
+                                            <td>{{ maintenance.operating_time }}</td>
+                                            <td>{{ maintenance.order_number }}</td>
+                                            <td>{{ maintenance.order_date }}</td>
+                                            <td><a href="{% url 'maintenanceorganization-detail' maintenance.maintenance_organization.pk%}" class="table-a">{{ maintenance.maintenance_organization.name }}</a></td>
+                                            <td><a href="{% url 'servicecompany-detail' maintenance.service_company.pk%}" class="table-a">{{ maintenance.service_company.name }}</a></td>
+                                        </tr>
+                                    {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif%}
+            </div>
+
+            <div id="Рекламации" class="tabcontent">
+                <h2>Информация о рекламациях по машине</h2>
+                {% if not machine.reclamations.all %}
+                    <h3>Данных о рекламациях не найдено</h3>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="info-table">
+                            <thead>
+                                <tr>
+                                    <th>Номер рекламации</th>
+                                    <th>Машина</th>
+                                    <th>Узел отказа</th>
+                                    <th>Дата отказа</th>
+                                    <th>Наработка, м/час</th>
+                                    <th>Описание отказа</th>
+                                    <th>Способ восстановления</th>
+                                    <th>Используемые запасные части</th>
+                                    <th>Дата восстановления</th>
+                                    <th>Время простоя техники</th>
+                                    <th>Сервисная компания</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reclamation in machine.reclamations.all %}
+                                    <tr>
+                                        <td><a href="{% url 'reclamation-detail' reclamation.pk%}" class="table-a">{{ reclamation.pk }}</a></td>
+                                        <td><a href="{% url 'machine-detail' reclamation.machine.pk %}" class="table-a">{{ reclamation.machine.serial_number }}</a></td>
+                                        <td><a href="{% url 'failurenode-detail' reclamation.failure_node.pk %}" class="table-a">{{ reclamation.failure_node.name }}</a></td>
+                                        <td>{{ reclamation.failure_date }}</td>
+                                        <td>{{ reclamation.operating_time }}</td>
+                                        <td>{{ reclamation.failure_description }}</td>
+                                        <td><a href="{% url 'recoverymethod-detail' reclamation.recovery_method.pk %}" class="table-a">{{ reclamation.recovery_method.name }}</a></td>
+                                        <td>{{ reclamation.spare_parts }}</td>
+                                        <td>{{ reclamation.recovery_date }}</td>
+                                        <td>{{ reclamation.downtime }}</td>
+                                        <td><a href="{% url 'servicecompany-detail' reclamation.service_company.pk %}" class="table-a">{{ reclamation.service_company.name }}</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}            
+            </div>
+        </div>
+    </div>
+    <script>
+        function openTable(evt, tableName) {
+            var i, tabcontent, tablinks;
+        
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+        
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+        
+            document.getElementById(tableName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelector('.tablinks').click();
+        });
+    </script>
+{% endblock %}
